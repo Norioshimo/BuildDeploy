@@ -1,0 +1,9 @@
+
+# Archivos compilados
+target/
+
+# Logs
+*.log
+
+# Base de Datos H2
+*.mv.db

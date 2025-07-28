@@ -178,6 +178,7 @@ public class PrincipalFrm extends javax.swing.JFrame {
         log.info("Opcion de Ejecutar");
         EjecutarFrm frm = new EjecutarFrm();
         frm.setVisible(true);
+        setVisible(false);
     }//GEN-LAST:event_jButtonEjecutarActionPerformed
 
     private void jButtonAyudaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAyudaActionPerformed

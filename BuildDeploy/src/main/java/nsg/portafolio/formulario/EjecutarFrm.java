@@ -6,6 +6,7 @@
 package nsg.portafolio.formulario;
 
 import java.util.List;
+import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import nsg.portafolio.Utiles;
 import nsg.portafolio.controller.EjecutarController;
@@ -33,7 +34,7 @@ public class EjecutarFrm extends javax.swing.JFrame {
      */
     public EjecutarFrm() {
         initComponents();
-        setLocationRelativeTo(null);
+        setLocationRelativeTo(null); 
 
         jTextFieldPom.setText(pomDir);
         jTextFieldBuild.setText(buildDir);
@@ -73,9 +74,11 @@ public class EjecutarFrm extends javax.swing.JFrame {
         jLabel9 = new javax.swing.JLabel();
         jTextFieldProyecto = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
+        jButtonCerrar = new javax.swing.JButton();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Ejecutar");
+        setUndecorated(true);
         setResizable(false);
 
         jPanel1.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
@@ -166,6 +169,14 @@ public class EjecutarFrm extends javax.swing.JFrame {
         jLabel10.setHorizontalAlignment(javax.swing.SwingConstants.LEFT);
         jLabel10.setText("Nombre Proyecto (*):");
 
+        jButtonCerrar.setFont(new java.awt.Font("Arial", 1, 14)); // NOI18N
+        jButtonCerrar.setText("CERRAR");
+        jButtonCerrar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButtonCerrarActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
@@ -197,8 +208,12 @@ public class EjecutarFrm extends javax.swing.JFrame {
                             .addComponent(jTextFieldWildfly)
                             .addComponent(jTextFieldWar)
                             .addComponent(jTextFieldBuild)
-                            .addComponent(jTextFieldMaven)))
-                    .addComponent(jButtonProcesar, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                            .addComponent(jTextFieldMaven)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addComponent(jButtonProcesar, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(jButtonCerrar, javax.swing.GroupLayout.PREFERRED_SIZE, 157, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(0, 0, Short.MAX_VALUE)))))
                 .addGap(14, 14, 14)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.DEFAULT_SIZE, 5, Short.MAX_VALUE))
         );
@@ -239,7 +254,9 @@ public class EjecutarFrm extends javax.swing.JFrame {
                     .addComponent(jLabel3)
                     .addComponent(jTextFieldWildfly, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                 .addGap(18, 18, 18)
-                .addComponent(jButtonProcesar)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonProcesar)
+                    .addComponent(jButtonCerrar))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel6)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
@@ -386,6 +403,14 @@ public class EjecutarFrm extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_jComboBoxConfiguracionesActionPerformed
 
+    private void jButtonCerrarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonCerrarActionPerformed
+        // TODO add your handling code here:
+        dispose();
+        PrincipalFrm frm = new PrincipalFrm();
+        frm.setVisible(true);
+        
+    }//GEN-LAST:event_jButtonCerrarActionPerformed
+
     private void setearCampos() {
         log.info("Setear Campos");
         jTextFieldProyecto.setText("");
@@ -462,6 +487,7 @@ public class EjecutarFrm extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButtonCerrar;
     private javax.swing.JButton jButtonProcesar;
     private javax.swing.JComboBox<Configuracion> jComboBoxConfiguraciones;
     private javax.swing.JLabel jLabel1;

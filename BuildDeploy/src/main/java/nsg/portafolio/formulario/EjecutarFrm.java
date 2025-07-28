@@ -6,12 +6,12 @@
 package nsg.portafolio.formulario;
 
 import java.util.List;
-import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import nsg.portafolio.Utiles;
 import nsg.portafolio.controller.EjecutarController;
 import nsg.portafolio.dao.ConfiguracionDAO;
 import nsg.portafolio.model.Configuracion;
+import nsg.portafolio.utiles.Sonidos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -349,18 +349,18 @@ public class EjecutarFrm extends javax.swing.JFrame {
                     EjecutarController inciar = new EjecutarController(pomDir, buildDir, warName, wildflyDeployDir, mavenExecutable);
 
                     inciar.procesar();
-
-                    JOptionPane.showMessageDialog(null, "Finalizado",
-                            "Status",
-                            JOptionPane.INFORMATION_MESSAGE);
+                    
+                    log.info("Proceso finalizado con exito.");
                 } catch (Exception ex) {
                     ex.printStackTrace();
                     JOptionPane.showMessageDialog(null, "Error al procesar. " + ex,
                             "Error",
                             JOptionPane.ERROR_MESSAGE);
                 } finally {
+                    Sonidos.reproducir();
                     Utiles.componentesBlocking(jPanel1, false);
-                    jButtonProcesar.setText("PROCESAR...");
+                    jButtonProcesar.setText("PROCESAR");
+                    
                 }
 
                 log.info("Proceso finalizado. ");

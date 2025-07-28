@@ -7,6 +7,7 @@ package nsg.portafolio.formulario;
 
 import javax.swing.JOptionPane;
 import nsg.portafolio.db.ConfigDB;
+import nsg.portafolio.utiles.Sonidos;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -179,6 +180,7 @@ public class PrincipalFrm extends javax.swing.JFrame {
         EjecutarFrm frm = new EjecutarFrm();
         frm.setVisible(true);
         setVisible(false);
+        
     }//GEN-LAST:event_jButtonEjecutarActionPerformed
 
     private void jButtonAyudaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonAyudaActionPerformed

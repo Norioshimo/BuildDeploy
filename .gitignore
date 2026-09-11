@@ -1,0 +1,50 @@
+# =========================================================
+# BuildDeploy - .gitignore raiz
+# =========================================================
+
+# --- Build / compilados ---
+target/
+build/
+out/
+*.class
+
+# --- Logs ---
+logs/
+*.log
+
+# --- Base de datos local (SQLite / H2) ---
+configdb/
+*.db
+*.mv.db
+*.trace.db
+*.lock.db
+
+# --- Eclipse ---
+.classpath
+.project
+.settings/
+.metadata/
+
+# --- NetBeans ---
+nbproject/private/
+nbdist/
+nbbuild/
+nb-configuration.xml
+
+# --- IntelliJ IDEA ---
+.idea/
+*.iml
+*.ipr
+*.iws
+
+# --- Visual Studio Code ---
+.vscode/
+
+# --- Sistema operativo ---
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# --- Varios ---
+*.tmp
+*.bak

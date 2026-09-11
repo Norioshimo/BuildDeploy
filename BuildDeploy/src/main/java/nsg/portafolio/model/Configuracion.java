@@ -6,6 +6,9 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import nsg.portafolio.enums.AppServer;
+import nsg.portafolio.enums.BuildTool;
+import nsg.portafolio.enums.DeployMode;
 
 @Getter
 @Setter
@@ -16,11 +19,41 @@ public class Configuracion {
 
     private Integer configuracion_id;
     private String nombre_proyecto;
+
+    // Herramienta de compilacion
+    private BuildTool herramientaBuild;
     private String pomDir;
     private String buildDir;
     private String warName;
-    private String wildflyDeployDir;
     private String mavenExecutable;
+    private String antExecutable;
+    private String antBuildFile;
+    private String antTarget;
+
+    // Servidor de aplicaciones
+    private AppServer servidor;
+    private String wildflyDeployDir;
+    private String glassfishDeployDir;
+    private DeployMode deployMode;
+    private String asadminPath;
+    private String gfHost;
+    private String gfPort;
+    private String gfUser;
+    private String gfPassword;
+    private String serverHome;
+    private String domainName;
+
+    // Automatizacion del deploy
+    private Boolean detenerAntesDeploy;
+    private Boolean reiniciarDespuesDeploy;
+
+    public boolean isDetenerAntesDeploy() {
+        return Boolean.TRUE.equals(detenerAntesDeploy);
+    }
+
+    public boolean isReiniciarDespuesDeploy() {
+        return Boolean.TRUE.equals(reiniciarDespuesDeploy);
+    }
 
     @Override
     public int hashCode() {

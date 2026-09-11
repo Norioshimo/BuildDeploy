@@ -1,9 +1,13 @@
-
 # Archivos compilados
 target/
 
 # Logs
+logs/
 *.log
 
-# Base de Datos H2
+# Base de datos local (SQLite / H2)
+configdb/
+*.db
 *.mv.db
+*.trace.db
+*.lock.db

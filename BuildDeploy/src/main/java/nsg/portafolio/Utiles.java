@@ -21,6 +21,9 @@ public class Utiles {
                     || comp instanceof JRadioButton) {
                 comp.setEnabled(!bloquear);
             }
+            if (comp instanceof Container) {
+                componentesBlocking((Container) comp, bloquear);
+            }
         }
     }
 }

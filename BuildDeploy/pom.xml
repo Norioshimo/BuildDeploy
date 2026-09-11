@@ -29,10 +29,18 @@
             <version>2.20.0</version>
         </dependency>
         
+        <!-- H2: solo se usa para migrar la base de datos existente a SQLite -->
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
             <version>2.2.224</version>
+        </dependency>
+
+        <!-- SQLite: motor de persistencia de configuraciones -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.45.3.0</version>
         </dependency>
         
         <dependency>
@@ -48,6 +56,20 @@
             <version>1.0.1</version>
         </dependency>
 
+        <!-- Pruebas -->
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.13.2</version>
+            <scope>test</scope>
+        </dependency>
+
+        <!-- Silencia los avisos SLF4J de sqlite-jdbc -->
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-nop</artifactId>
+            <version>1.7.36</version>
+        </dependency>
 
     </dependencies>
         
@@ -56,15 +78,6 @@
     <build>
         <finalName>BuildDeploy</finalName> 
         <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-eclipse-plugin</artifactId>
-                <version>2.9</version>
-                <configuration>
-                    <downloadSources>true</downloadSources>
-                    <downloadJavadocs>false</downloadJavadocs>
-                </configuration>
-            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
@@ -82,7 +95,7 @@
                     <archive>
                         <manifest>  
                             <mainClass>
-                                nsg.portafolio.formulario.PrincipalFrm
+                                nsg.portafolio.ui.App
                             </mainClass>
                         </manifest>
                     </archive>
@@ -114,11 +127,12 @@
                             </filters>
                             <transformers>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
-                                    <mainClass>nsg.portafolio.formulario.PrincipalFrm</mainClass>
+                                    <mainClass>nsg.portafolio.ui.App</mainClass>
                                 </transformer>
                                 <transformer implementation="org.apache.maven.plugins.shade.resource.AppendingTransformer">
                                     <resource>reference.conf</resource>
                                 </transformer>
+                                <transformer implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                             </transformers>
                             <shadedArtifactAttached>true</shadedArtifactAttached>
                             <shadedClassifierName>shaded</shadedClassifierName>

@@ -1,6 +1,9 @@
 package nsg.portafolio.ui;
 
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import javax.swing.BorderFactory;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -49,6 +52,30 @@ public abstract class BaseFrm extends JFrame {
                 new RoundedBorder(UITheme.BORDER, 14, 1),
                 BorderFactory.createEmptyBorder(14, 14, 14, 14)));
         return panel;
+    }
+
+    /**
+     * Ajusta la ventana al contenido y la limita al area visible del monitor,
+     * evitando que se salga de la pantalla en resoluciones pequenas.
+     */
+    protected void adaptarPantalla(Dimension minimo) {
+        pack();
+        Rectangle disponible = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        int ancho = Math.min(getWidth(), disponible.width - 20);
+        int alto = Math.min(getHeight(), disponible.height - 40);
+        setSize(ancho, alto);
+        setMinimumSize(new Dimension(Math.min(minimo.width, ancho), Math.min(minimo.height, alto)));
+        setLocationRelativeTo(null);
+    }
+
+    /**
+     * Abre la ventana maximizada conservando la barra de titulo y los bordes.
+     */
+    protected void pantallaCompleta(Dimension minimo) {
+        pack();
+        setMinimumSize(minimo);
+        setLocationRelativeTo(null);
+        setExtendedState(getExtendedState() | JFrame.MAXIMIZED_BOTH);
     }
 
     protected JLabel pie() {

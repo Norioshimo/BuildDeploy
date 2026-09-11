@@ -13,9 +13,14 @@ public class EjecutarController {
     private static final Logger log = LogManager.getLogger(EjecutarController.class);
 
     private final Configuracion conf;
+    private int puertoDetectado = -1;
 
     public EjecutarController(Configuracion conf) {
         this.conf = conf;
+    }
+
+    public int getPuertoDetectado() {
+        return puertoDetectado;
     }
 
     public void procesar() throws Exception {
@@ -30,6 +35,7 @@ public class EjecutarController {
         boolean estabaCorriendo = lifecycle.estaCorriendo();
         log.info(" Estado inicial del servidor: " + (estabaCorriendo ? "EN EJECUCION" : "DETENIDO"));
 
+        boolean iniciadoAqui = false;
         try {
             if (conf.isDetenerAntesDeploy() && estabaCorriendo) {
                 log.info(" Deteniendo el servidor antes del despliegue...");
@@ -45,7 +51,12 @@ public class EjecutarController {
                 log.info(" El servidor no esta en ejecucion. Iniciandolo antes del despliegue...");
                 lifecycle.iniciar();
                 esperarArranque(lifecycle);
+                iniciadoAqui = true;
             }
+
+            puertoDetectado = lifecycle.puertoHttp();
+            log.info(" Puerto HTTP detectado: "
+                    + (puertoDetectado > 0 ? String.valueOf(puertoDetectado) : "no detectado"));
 
             DeployStrategy deploy = EstrategiaFactory.deploy(conf);
             if (!deploy.procesar()) {
@@ -59,6 +70,15 @@ public class EjecutarController {
         } catch (Exception ex) {
             log.error(" Error en el proceso build & deploy: " + ex.getMessage(), ex);
             throw ex;
+        } finally {
+            if (iniciadoAqui && conf.isDetenerAlFinalizar()) {
+                log.info(" Deteniendo el servidor iniciado por este proceso...");
+                try {
+                    lifecycle.detener();
+                } catch (Exception ex) {
+                    log.warn(" No se pudo detener el servidor: " + ex.getMessage());
+                }
+            }
         }
 
         log.info(" Proceso build & deploy finalizado.");

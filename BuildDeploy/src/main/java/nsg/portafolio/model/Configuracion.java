@@ -46,6 +46,7 @@ public class Configuracion {
     // Automatizacion del deploy
     private Boolean detenerAntesDeploy;
     private Boolean reiniciarDespuesDeploy;
+    private Boolean detenerAlFinalizar;
 
     public boolean isDetenerAntesDeploy() {
         return Boolean.TRUE.equals(detenerAntesDeploy);
@@ -53,6 +54,10 @@ public class Configuracion {
 
     public boolean isReiniciarDespuesDeploy() {
         return Boolean.TRUE.equals(reiniciarDespuesDeploy);
+    }
+
+    public boolean isDetenerAlFinalizar() {
+        return Boolean.TRUE.equals(detenerAlFinalizar);
     }
 
     @Override

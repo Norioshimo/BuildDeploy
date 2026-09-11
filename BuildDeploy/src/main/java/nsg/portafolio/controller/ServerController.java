@@ -40,6 +40,10 @@ public class ServerController {
         return lifecycle.estaCorriendo();
     }
 
+    public int puertoHttp() {
+        return lifecycle.puertoHttp();
+    }
+
     public String descripcion() {
         return lifecycle.descripcion();
     }

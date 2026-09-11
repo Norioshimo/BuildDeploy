@@ -68,6 +68,7 @@ public class ConfiguracionFrm extends BaseFrm {
     private JTextField txtDomainName;
     private JCheckBox chkDetenerAntes;
     private JCheckBox chkReiniciarDespues;
+    private JCheckBox chkDetenerAlFinalizar;
     private BotonPlano btnGuardar;
     private BotonPlano btnEliminar;
 
@@ -76,13 +77,11 @@ public class ConfiguracionFrm extends BaseFrm {
     public ConfiguracionFrm() {
         super("Configuracion");
         initUI();
-        setLocationRelativeTo(null);
         actualizarLista();
+        pantallaCompleta(new Dimension(660, 540));
     }
 
     private void initUI() {
-        setMinimumSize(new Dimension(700, 620));
-
         JPanel raiz = raiz();
         raiz.add(encabezado("Configuracion", "Administra las configuraciones de build & deploy"), BorderLayout.NORTH);
 
@@ -145,8 +144,10 @@ public class ConfiguracionFrm extends BaseFrm {
         automatizacion.setOpaque(false);
         chkDetenerAntes = new JCheckBox("Detener antes del deploy");
         chkReiniciarDespues = new JCheckBox("Reiniciar despues del deploy");
+        chkDetenerAlFinalizar = new JCheckBox("Detener servidor al finalizar");
         automatizacion.add(chkDetenerAntes);
         automatizacion.add(chkReiniciarDespues);
+        automatizacion.add(chkDetenerAlFinalizar);
         addFullRow(formServidor, 3, automatizacion);
         tarjetaServidor.add(formServidor, BorderLayout.CENTER);
 
@@ -179,7 +180,6 @@ public class ConfiguracionFrm extends BaseFrm {
         raiz.add(sur, BorderLayout.SOUTH);
 
         setContentPane(raiz);
-        pack();
     }
 
     private JPanel seccion(String titulo) {
@@ -263,7 +263,9 @@ public class ConfiguracionFrm extends BaseFrm {
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        campo.setPreferredSize(new Dimension(330, 28));
+        if (campo instanceof JTextField) {
+            ((JTextField) campo).setColumns(28);
+        }
         panel.add(campo, gbc);
     }
 
@@ -319,6 +321,7 @@ public class ConfiguracionFrm extends BaseFrm {
         txtDomainName.setText(nvl(seleccion.getDomainName()));
         chkDetenerAntes.setSelected(seleccion.isDetenerAntesDeploy());
         chkReiniciarDespues.setSelected(seleccion.isReiniciarDespuesDeploy());
+        chkDetenerAlFinalizar.setSelected(seleccion.isDetenerAlFinalizar());
 
         layoutHerramienta.show(cardHerramienta, cardHerramientaActual());
         layoutServidor.show(cardServidor, cardServidorActual());
@@ -345,6 +348,7 @@ public class ConfiguracionFrm extends BaseFrm {
         txtDomainName.setText("");
         chkDetenerAntes.setSelected(false);
         chkReiniciarDespues.setSelected(false);
+        chkDetenerAlFinalizar.setSelected(false);
     }
 
     private void guardar() {
@@ -381,6 +385,7 @@ public class ConfiguracionFrm extends BaseFrm {
                     .domainName(txtDomainName.getText().trim())
                     .detenerAntesDeploy(chkDetenerAntes.isSelected())
                     .reiniciarDespuesDeploy(chkReiniciarDespues.isSelected())
+                    .detenerAlFinalizar(chkDetenerAlFinalizar.isSelected())
                     .build();
 
             new ConfiguracionDAO().guardar(conf);

@@ -62,18 +62,18 @@ public class AyudaFrm extends BaseFrm {
     public AyudaFrm() {
         super("Ayuda");
         initUI();
-        setLocationRelativeTo(null);
+        pantallaCompleta(new Dimension(640, 480));
     }
 
     private void initUI() {
-        setMinimumSize(new Dimension(720, 560));
-
         JPanel raiz = raiz();
         raiz.add(encabezado("Ayuda", "Ejemplos de configuracion para WildFly, GlassFish, Maven y Ant"), BorderLayout.NORTH);
 
         JTextArea area = new JTextArea(TEXTO);
         area.setEditable(false);
         area.setFont(UITheme.FONT_MONO);
+        area.setColumns(72);
+        area.setRows(24);
         area.setBackground(UITheme.SURFACE);
         JScrollPane scroll = new JScrollPane(area);
         scroll.setBorder(BorderFactory.createCompoundBorder(
@@ -93,7 +93,6 @@ public class AyudaFrm extends BaseFrm {
         raiz.add(sur, BorderLayout.SOUTH);
 
         setContentPane(raiz);
-        pack();
     }
 
     public static void main(String[] args) {

@@ -6,8 +6,11 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
+import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BorderFactory;
+import javax.swing.JCheckBox;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -16,6 +19,7 @@ import javax.swing.JProgressBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import nsg.portafolio.Utiles;
 import nsg.portafolio.controller.EjecutarController;
 import nsg.portafolio.controller.ServerController;
@@ -29,6 +33,8 @@ import nsg.portafolio.ui.BotonPlano;
 import nsg.portafolio.ui.Iconos;
 import nsg.portafolio.ui.TextAreaAppender;
 import nsg.portafolio.ui.UITheme;
+import nsg.portafolio.utiles.LogsUtil;
+import nsg.portafolio.utiles.TailArchivo;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -39,6 +45,7 @@ import org.apache.logging.log4j.Logger;
 public class EjecutarFrm extends BaseFrm {
 
     private static final Logger log = LogManager.getLogger(EjecutarFrm.class);
+    private static final int MAX_CONSOLA = 5000;
 
     private JComboBox<Configuracion> cbConfiguraciones;
     private JTextField txtProyecto;
@@ -47,6 +54,7 @@ public class EjecutarFrm extends BaseFrm {
     private JTextField txtBuildDir;
     private JTextField txtWarName;
     private JTextField txtDestino;
+    private JTextField txtPuerto;
     private JLabel lblEstadoServidor;
     private BotonPlano btnIniciar;
     private BotonPlano btnDetener;
@@ -55,20 +63,21 @@ public class EjecutarFrm extends BaseFrm {
     private BotonPlano btnProcesar;
     private BotonPlano btnCerrar;
     private JTextArea areaConsola;
+    private JCheckBox chkLogsServidor;
     private JProgressBar progreso;
+
+    private final List<TailArchivo> tailers = new ArrayList<>();
 
     private Configuracion configuracion;
 
     public EjecutarFrm() {
         super("Ejecutar");
         initUI();
-        setLocationRelativeTo(null);
         actualizarLista();
+        pantallaCompleta(new Dimension(720, 520));
     }
 
     private void initUI() {
-        setMinimumSize(new Dimension(820, 640));
-
         JPanel raiz = raiz();
         raiz.add(encabezado("Ejecutar", "Compila y despliega el WAR en el servidor seleccionado"), BorderLayout.NORTH);
 
@@ -98,6 +107,8 @@ public class EjecutarFrm extends BaseFrm {
         addCampo(form, 5, "Nombre de WAR:", txtWarName);
         txtDestino = campoLectura();
         addCampo(form, 6, "Destino del deploy:", txtDestino);
+        txtPuerto = campoLectura();
+        addCampo(form, 7, "Puerto HTTP:", txtPuerto);
         tarjetaResumen.add(form, BorderLayout.CENTER);
 
         // Tarjeta servidor
@@ -126,17 +137,41 @@ public class EjecutarFrm extends BaseFrm {
         superior.add(tarjetaServidor);
 
         // Tarjeta consola
-        JPanel tarjetaConsola = seccion("Consola en vivo");
+        JPanel tarjetaConsola = tarjeta();
+        tarjetaConsola.setLayout(new BorderLayout(0, 10));
+
+        JPanel cabeceraConsola = new JPanel(new BorderLayout());
+        cabeceraConsola.setOpaque(false);
+        JLabel lblConsola = new JLabel("Consola en vivo");
+        lblConsola.setFont(UITheme.FONT_BOLD);
+        lblConsola.setForeground(UITheme.PRIMARY);
+        cabeceraConsola.add(lblConsola, BorderLayout.WEST);
+        chkLogsServidor = new JCheckBox("Ver logs del servidor");
+        chkLogsServidor.setOpaque(false);
+        chkLogsServidor.addActionListener(evt -> actualizarTailers());
+        cabeceraConsola.add(chkLogsServidor, BorderLayout.EAST);
+        tarjetaConsola.add(cabeceraConsola, BorderLayout.NORTH);
+
         areaConsola = new JTextArea();
         areaConsola.setEditable(false);
         areaConsola.setFont(UITheme.FONT_MONO);
+        areaConsola.setRows(10);
+        areaConsola.setColumns(60);
         areaConsola.setBackground(UITheme.SURFACE);
         JScrollPane scroll = new JScrollPane(areaConsola);
         scroll.setBorder(BorderFactory.createLineBorder(UITheme.BORDER));
         tarjetaConsola.add(scroll, BorderLayout.CENTER);
         TextAreaAppender.setArea(areaConsola);
 
-        centro.add(superior, BorderLayout.NORTH);
+        JScrollPane scrollSuperior = new JScrollPane(superior);
+        scrollSuperior.setBorder(BorderFactory.createEmptyBorder());
+        scrollSuperior.setOpaque(false);
+        scrollSuperior.getViewport().setOpaque(false);
+        scrollSuperior.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
+        scrollSuperior.getVerticalScrollBar().setUnitIncrement(16);
+        scrollSuperior.setPreferredSize(new Dimension(100, 250));
+
+        centro.add(scrollSuperior, BorderLayout.NORTH);
         centro.add(tarjetaConsola, BorderLayout.CENTER);
         raiz.add(centro, BorderLayout.CENTER);
 
@@ -166,7 +201,6 @@ public class EjecutarFrm extends BaseFrm {
         raiz.add(sur, BorderLayout.SOUTH);
 
         setContentPane(raiz);
-        pack();
     }
 
     private JPanel seccion(String titulo) {
@@ -202,7 +236,9 @@ public class EjecutarFrm extends BaseFrm {
         gbc.gridx = 1;
         gbc.weightx = 1;
         gbc.fill = GridBagConstraints.HORIZONTAL;
-        campo.setPreferredSize(new Dimension(380, 26));
+        if (campo instanceof JTextField) {
+            ((JTextField) campo).setColumns(32);
+        }
         panel.add(campo, gbc);
     }
 
@@ -235,7 +271,9 @@ public class EjecutarFrm extends BaseFrm {
         txtBuildDir.setText(nvl(configuracion.getBuildDir()));
         txtWarName.setText(nvl(configuracion.getWarName()));
         txtDestino.setText(describirDestino(configuracion));
+        txtPuerto.setText("");
         actualizarEstadoServidor();
+        actualizarTailers();
     }
 
     private String describirDestino(Configuracion conf) {
@@ -318,8 +356,9 @@ public class EjecutarFrm extends BaseFrm {
             areaConsola.append("========================================\n");
             areaConsola.append("Iniciando build & deploy de " + configuracion.getNombre_proyecto() + "\n");
 
+            EjecutarController controller = new EjecutarController(configuracion);
             try {
-                new EjecutarController(configuracion).procesar();
+                controller.procesar();
                 areaConsola.append("Proceso finalizado con exito.\n");
                 nsg.portafolio.utiles.Sonidos.exito();
             } catch (Exception ex) {
@@ -328,6 +367,7 @@ public class EjecutarFrm extends BaseFrm {
                 nsg.portafolio.utiles.Sonidos.error();
                 JOptionPane.showMessageDialog(this, "Error al procesar. " + ex.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
             } finally {
+                mostrarPuerto(controller.getPuertoDetectado());
                 progreso.setVisible(false);
                 btnProcesar.setText("Procesar");
                 Utiles.componentesBlocking(getContentPane(), false);
@@ -365,9 +405,66 @@ public class EjecutarFrm extends BaseFrm {
         return true;
     }
 
+    private void actualizarTailers() {
+        detenerTailers();
+        if (chkLogsServidor == null || !chkLogsServidor.isSelected() || configuracion == null) {
+            return;
+        }
+
+        AppServer server = configuracion.getServidor() == null ? AppServer.WILDFLY : configuracion.getServidor();
+        if (server == AppServer.WILDFLY) {
+            agregarTailer(LogsUtil.archivoConsolaArranque(), "[arranque] ", true);
+        }
+        agregarTailer(LogsUtil.archivoLogServidor(configuracion), "[servidor] ", false);
+    }
+
+    private void agregarTailer(File archivo, String prefijo, boolean desdeInicio) {
+        TailArchivo tailer = new TailArchivo(archivo, linea ->
+                SwingUtilities.invokeLater(() -> anexarConsola(prefijo + linea)), 500L, desdeInicio);
+        tailer.iniciar();
+        tailers.add(tailer);
+    }
+
+    private void detenerTailers() {
+        for (TailArchivo tailer : tailers) {
+            tailer.detener();
+        }
+        tailers.clear();
+    }
+
+    private void anexarConsola(String texto) {
+        areaConsola.append(texto + "\n");
+        int lineas = areaConsola.getLineCount();
+        if (lineas > MAX_CONSOLA) {
+            try {
+                int fin = areaConsola.getLineStartOffset(lineas - MAX_CONSOLA);
+                areaConsola.replaceRange("", 0, fin);
+            } catch (Exception ex) {
+                areaConsola.setText("");
+            }
+        }
+        areaConsola.setCaretPosition(areaConsola.getDocument().getLength());
+    }
+
+    @Override
+    public void dispose() {
+        detenerTailers();
+        super.dispose();
+    }
+
     private void cerrar() {
         dispose();
         new PrincipalFrm().setVisible(true);
+    }
+
+    private void mostrarPuerto(int puerto) {
+        if (puerto > 0) {
+            String url = "http://localhost:" + puerto;
+            txtPuerto.setText(url);
+            areaConsola.append("Aplicacion disponible en: " + url + "\n");
+        } else {
+            txtPuerto.setText("No detectado");
+        }
     }
 
     private void aviso(String mensaje) {

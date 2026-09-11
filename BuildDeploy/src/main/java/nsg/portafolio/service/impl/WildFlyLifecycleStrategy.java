@@ -5,8 +5,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import nsg.portafolio.enums.AppServer;
 import nsg.portafolio.service.ServerLifecycleStrategy;
 import nsg.portafolio.utiles.ProcesoUtil;
+import nsg.portafolio.utiles.PuertoUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -67,6 +69,11 @@ public class WildFlyLifecycleStrategy implements ServerLifecycleStrategy {
     public boolean estaCorriendo() {
         return ProcesoUtil.puertoAbierto("localhost", PUERTO_ADMIN)
                 || ProcesoUtil.puertoAbierto("localhost", 8080);
+    }
+
+    @Override
+    public int puertoHttp() {
+        return PuertoUtil.detectarPuertoHttp(AppServer.WILDFLY, serverHome, null);
     }
 
     @Override

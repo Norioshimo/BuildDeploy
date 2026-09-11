@@ -4,8 +4,10 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import nsg.portafolio.enums.AppServer;
 import nsg.portafolio.service.ServerLifecycleStrategy;
 import nsg.portafolio.utiles.ProcesoUtil;
+import nsg.portafolio.utiles.PuertoUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -84,6 +86,11 @@ public class GlassFishLifecycleStrategy implements ServerLifecycleStrategy {
             log.warn(" No se pudo consultar el estado de GlassFish: " + ex.getMessage());
         }
         return false;
+    }
+
+    @Override
+    public int puertoHttp() {
+        return PuertoUtil.detectarPuertoHttp(AppServer.GLASSFISH, serverHome, domainName);
     }
 
     @Override

@@ -65,11 +65,33 @@ public abstract class ConfigDB<T> {
                     + "serverHome VARCHAR(1000),"
                     + "domainName VARCHAR(200),"
                     + "detenerAntesDeploy INTEGER DEFAULT 0,"
-                    + "reiniciarDespuesDeploy INTEGER DEFAULT 0"
+                    + "reiniciarDespuesDeploy INTEGER DEFAULT 0,"
+                    + "detenerAlFinalizar INTEGER DEFAULT 0"
                     + ") ");
+
+            asegurarColumna(conn, "detenerAlFinalizar", "INTEGER DEFAULT 0");
         }
 
         MigradorH2ASQLite.migrarSiEsNecesario();
+    }
+
+    private static void asegurarColumna(Connection conn, String columna, String definicion) throws SQLException {
+        boolean existe = false;
+        try (java.sql.Statement st = conn.createStatement();
+                java.sql.ResultSet rs = st.executeQuery("PRAGMA table_info(configuraciones)")) {
+            while (rs.next()) {
+                if (columna.equalsIgnoreCase(rs.getString("name"))) {
+                    existe = true;
+                    break;
+                }
+            }
+        }
+        if (!existe) {
+            try (java.sql.Statement st = conn.createStatement()) {
+                st.execute("ALTER TABLE configuraciones ADD COLUMN " + columna + " " + definicion);
+                log.info("Columna agregada a configuraciones: " + columna);
+            }
+        }
     }
 
     public static Connection conectar() throws SQLException {

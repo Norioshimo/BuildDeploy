@@ -6,7 +6,6 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.io.File;
 import java.io.RandomAccessFile;
-import java.nio.file.Paths;
 import java.util.List;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBox;
@@ -18,8 +17,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.Timer;
 import nsg.portafolio.dao.ConfiguracionDAO;
-import nsg.portafolio.enums.AppServer;
 import nsg.portafolio.model.Configuracion;
+import nsg.portafolio.utiles.LogsUtil;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -58,14 +57,13 @@ public class LogFrm extends BaseFrm {
     public LogFrm() {
         super("Logs");
         initUI();
-        setLocationRelativeTo(null);
         cargarConfiguraciones();
+        pantallaCompleta(new Dimension(660, 460));
         refrescar();
     }
 
     private void initUI() {
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        setMinimumSize(new Dimension(760, 520));
 
         JPanel raiz = raiz();
         raiz.add(encabezado("Logs", "Consulte el log de la aplicacion o del servidor en tiempo real"), BorderLayout.NORTH);
@@ -79,7 +77,7 @@ public class LogFrm extends BaseFrm {
 
         controles.add(new JLabel("Configuracion:"));
         cbConfiguracion = new JComboBox<>();
-        cbConfiguracion.setPreferredSize(new Dimension(220, 26));
+        cbConfiguracion.setPrototypeDisplayValue(Configuracion.builder().nombre_proyecto("Configuracion de ejemplo larga").build());
         cbConfiguracion.addActionListener(evt -> refrescar());
         controles.add(cbConfiguracion);
 
@@ -106,6 +104,8 @@ public class LogFrm extends BaseFrm {
         area = new JTextArea();
         area.setEditable(false);
         area.setFont(new Font("Consolas", Font.PLAIN, 12));
+        area.setRows(18);
+        area.setColumns(80);
         area.setBackground(UITheme.SURFACE);
         JScrollPane scroll = new JScrollPane(area);
         scroll.setBorder(BorderFactory.createCompoundBorder(
@@ -127,7 +127,6 @@ public class LogFrm extends BaseFrm {
         raiz.add(sur, BorderLayout.SOUTH);
 
         setContentPane(raiz);
-        pack();
     }
 
     private void cargarConfiguraciones() {
@@ -174,26 +173,12 @@ public class LogFrm extends BaseFrm {
     private File resolverArchivo(Fuente fuente) {
         switch (fuente) {
             case ARRANQUE:
-                return new File("logs/wildfly-consola.log");
+                return LogsUtil.archivoConsolaArranque();
             case SERVIDOR:
-                return resolverLogServidor();
+                return LogsUtil.archivoLogServidor((Configuracion) cbConfiguracion.getSelectedItem());
             default:
-                return new File("logs/app.log");
+                return LogsUtil.archivoLogAplicacion();
         }
-    }
-
-    private File resolverLogServidor() {
-        Configuracion conf = (Configuracion) cbConfiguracion.getSelectedItem();
-        if (conf == null || conf.getServerHome() == null || conf.getServerHome().trim().isEmpty()) {
-            return new File("logs/app.log");
-        }
-        AppServer server = conf.getServidor() == null ? AppServer.WILDFLY : conf.getServidor();
-        if (server == AppServer.GLASSFISH) {
-            String dominio = (conf.getDomainName() == null || conf.getDomainName().trim().isEmpty())
-                    ? "domain1" : conf.getDomainName().trim();
-            return Paths.get(conf.getServerHome(), "domains", dominio, "logs", "server.log").toFile();
-        }
-        return Paths.get(conf.getServerHome(), "standalone", "log", "server.log").toFile();
     }
 
     private String leerUltimas(File archivo, int maxLineas) throws Exception {

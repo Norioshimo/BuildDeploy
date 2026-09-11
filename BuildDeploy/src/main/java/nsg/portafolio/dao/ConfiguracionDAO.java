@@ -22,9 +22,9 @@ public class ConfiguracionDAO extends ConfigDB<Configuracion> {
     private static final String COLUMNAS = "nombre_proyecto,herramienta_build,pomDir,buildDir,"
             + "warName,mavenExecutable,antExecutable,antBuildFile,antTarget,servidor,wildflyDeployDir,"
             + "glassfishDeployDir,deployMode,asadminPath,gfHost,gfPort,gfUser,gfPassword,serverHome,domainName,"
-            + "detenerAntesDeploy,reiniciarDespuesDeploy";
+            + "detenerAntesDeploy,reiniciarDespuesDeploy,detenerAlFinalizar";
 
-    private static final String PARAMETROS = "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?";
+    private static final String PARAMETROS = "?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?";
 
     @Override
     public void guardar(Configuracion conf) throws SQLException {
@@ -37,7 +37,7 @@ public class ConfiguracionDAO extends ConfigDB<Configuracion> {
             sql = "UPDATE configuraciones SET nombre_proyecto=?,herramienta_build=?,pomDir=?,buildDir=?,warName=?,"
                     + "mavenExecutable=?,antExecutable=?,antBuildFile=?,antTarget=?,servidor=?,wildflyDeployDir=?,"
                     + "glassfishDeployDir=?,deployMode=?,asadminPath=?,gfHost=?,gfPort=?,gfUser=?,gfPassword=?,"
-                    + "serverHome=?,domainName=?,detenerAntesDeploy=?,reiniciarDespuesDeploy=? "
+                    + "serverHome=?,domainName=?,detenerAntesDeploy=?,reiniciarDespuesDeploy=?,detenerAlFinalizar=? "
                     + "WHERE configuracion_id=?";
         }
 
@@ -67,6 +67,7 @@ public class ConfiguracionDAO extends ConfigDB<Configuracion> {
             stmt.setString(i++, conf.getDomainName());
             stmt.setInt(i++, conf.isDetenerAntesDeploy() ? 1 : 0);
             stmt.setInt(i++, conf.isReiniciarDespuesDeploy() ? 1 : 0);
+            stmt.setInt(i++, conf.isDetenerAlFinalizar() ? 1 : 0);
 
             if (!nuevo) {
                 stmt.setInt(i, conf.getConfiguracion_id());
@@ -153,6 +154,7 @@ public class ConfiguracionDAO extends ConfigDB<Configuracion> {
         conf.setDomainName(rs.getString("domainName"));
         conf.setDetenerAntesDeploy(rs.getInt("detenerAntesDeploy") == 1);
         conf.setReiniciarDespuesDeploy(rs.getInt("reiniciarDespuesDeploy") == 1);
+        conf.setDetenerAlFinalizar(rs.getInt("detenerAlFinalizar") == 1);
         return conf;
     }
 
